@@ -1,0 +1,42 @@
+# Именованные Docker volumes
+volumes:
+  pg_data:
+  static:
+
+# Контейнеры проекта
+services:
+  # PostgreSQL
+  db:
+    image: postgres:13.10
+    env_file: .env
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  # Django + Gunicorn
+  backend:
+    build: ./backend/
+    env_file: .env
+    volumes:
+      - static:/backend_static
+    depends_on:
+      - db
+
+  # React-фронтенд
+  frontend:
+    build: ./frontend/
+    env_file: .env
+    volumes:
+      - static:/frontend_static
+    command: cp -r /app/build/. /frontend_static/
+
+  # Nginx — точка входа в приложение
+  gateway:
+    # Собираем образ из папки gateway
+    build: ./gateway/
+    volumes:
+      - static:/staticfiles
+
+    # Запросы на localhost:8000
+    # перенаправляем на порт 80 контейнера Nginx
+    ports:
+      - 8000:80

@@ -1,0 +1,24 @@
+# Название workflow в интерфейсе GitHub Actions
+name: Main Taski Workflow
+
+# Workflow запускается при push в ветку main
+on:
+  push:
+    branches:
+      - main
+
+# Задачи workflow
+jobs:
+  checkout-and-print-tree:
+    # GitHub создаст временный сервер с Ubuntu
+    runs-on: ubuntu-latest
+
+    # Последовательность шагов задачи
+    steps:
+      # Копируем код репозитория на сервер GitHub Actions
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      # Выводим дерево файлов проекта
+      - name: Print project tree
+        run: tree .
